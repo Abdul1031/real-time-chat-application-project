@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import type { FormEvent } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import {
+  Eye,
   EyeOff,
-  Loader,
   Loader2,
+  Lock,
   Mail,
   MessageSquare,
   User,
@@ -11,20 +13,30 @@ import {
 import { Link } from "react-router-dom";
 import AuthImagePattern from "../components/AuthImagePattern";
 
-const SignUpPage = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({
+interface SignUpForm {
+  fullName: string;
+  email: string;
+  password: string;
+}
+
+interface AuthStore {
+  signup: (data: SignUpForm) => Promise<void>;
+  isSigningUp: boolean;
+}
+
+const SignUpPage: React.FC = () => {
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [formData, setFormData] = useState<SignUpForm>({
     fullName: "",
     email: "",
     password: "",
   });
 
-  const { signup, isSigningUp } = useAuthStore();
+  const { signup, isSigningUp } = useAuthStore() as AuthStore;
 
-  const validateForm = () => {};
-
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    signup(formData);
   };
 
   return (
@@ -102,10 +114,11 @@ const SignUpPage = () => {
                 className="absolute inset-y-0 right-0 pr-3 flex items-center"
                 onClick={() => setShowPassword(!showPassword)}
               >
-                {showPassword} ? (
-                <EyeOff className="size-5 text-base-content/40" />
+                {showPassword ? (
+                  <EyeOff className="size-5 text-base-content/40" />
                 ) : (
-                <Eye className="size-5 text-base-content/40" />)
+                  <Eye className="size-5 text-base-content/40" />
+                )}
               </button>
             </div>
           </div>
@@ -127,7 +140,7 @@ const SignUpPage = () => {
         <div className="text-center">
           <p className="text-base-content/60">
             Already have an account?{" "}
-            <Link to="/login" className="linl link-primary">
+            <Link to="/login" className="link link-primary">
               Sign in
             </Link>
           </p>

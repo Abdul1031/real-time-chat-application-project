@@ -1,6 +1,12 @@
+import React from "react";
 import { THEMES } from "../constants";
 import { useThemeStore } from "../store/useThemeStore";
 import { Send } from "lucide-react";
+
+interface ThemeStore {
+  theme: string;
+  setTheme: (theme: string) => void;
+}
 
 const PREVIEW_MESSAGES = [
   { id: 1, content: "Hey! How's it going?", isSent: false },
@@ -11,8 +17,8 @@ const PREVIEW_MESSAGES = [
   },
 ];
 
-const SettingsPage = () => {
-  const { theme, setTheme } = useThemeStore();
+const SettingsPage: React.FC = () => {
+  const { theme, setTheme } = useThemeStore() as ThemeStore;
 
   return (
     <div className="h-screen container mx-auto px-4 pt-20 max-w-5xl">

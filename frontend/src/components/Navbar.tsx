@@ -1,9 +1,23 @@
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
+
+interface AuthUser {
+  _id: string;
+  fullName: string;
+  name?: string;
+  profilePic?: string;
+}
+
+interface AuthStore {
+  logout: () => Promise<void>;
+  authUser: AuthUser | null;
+}
 import { LogOut, MessageSquare, Settings, User } from "lucide-react";
 
-const Navbar = () => {
-  const { logout, authUser } = useAuthStore();
+import React from "react";
+
+const Navbar: React.FC = () => {
+  const { logout, authUser } = useAuthStore() as AuthStore;
 
   return (
     <header

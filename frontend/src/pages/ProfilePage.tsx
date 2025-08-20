@@ -1,21 +1,35 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import type { ChangeEvent } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import { Camera, Mail, User } from "lucide-react";
 
-const ProfilePage = () => {
-  const { authUser, isUpdatingProfile, updateProfile } = useAuthStore();
-  const [selectedImg, setSelectedImg] = useState(null);
+interface UserType {
+  _id: string;
+  fullName: string;
+  profilePic?: string;
+  email?: string;
+  createdAt?: string;
+}
 
-  const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
+interface AuthStore {
+  authUser: UserType;
+  isUpdatingProfile: boolean;
+  updateProfile: (data: { profilePic: string }) => Promise<void>;
+}
+
+const ProfilePage: React.FC = () => {
+  const { authUser, isUpdatingProfile, updateProfile } =
+    useAuthStore() as AuthStore;
+  const [selectedImg, setSelectedImg] = useState<string | null>(null);
+
+  const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (!file) return;
- 
+
     const reader = new FileReader();
-
     reader.readAsDataURL(file);
-
     reader.onload = async () => {
-      const base64Image = reader.result;
+      const base64Image = reader.result as string;
       setSelectedImg(base64Image);
       await updateProfile({ profilePic: base64Image });
     };

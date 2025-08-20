@@ -9,14 +9,33 @@ import ProfilePage from "./pages/ProfilePage";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuthStore } from "./store/useAuthStore";
 import { useThemeStore } from "./store/useThemeStore";
-import { useEffect } from "react";
 
 import { Loader } from "lucide-react";
 import { Toaster } from "react-hot-toast";
 
-const App = () => {
-  const { authUser, checkAuth, isCheckingAuth, onlineUsers } = useAuthStore();
-  const { theme } = useThemeStore();
+import React, { useEffect } from "react";
+
+interface User {
+  _id: string;
+  fullName: string;
+  profilePic?: string;
+}
+
+interface AuthStore {
+  authUser: User | null;
+  checkAuth: () => Promise<void>;
+  isCheckingAuth: boolean;
+  onlineUsers?: User[];
+}
+
+interface ThemeStore {
+  theme: string;
+}
+
+const App: React.FC = () => {
+  const { authUser, checkAuth, isCheckingAuth, onlineUsers } =
+    useAuthStore() as AuthStore;
+  const { theme } = useThemeStore() as ThemeStore;
 
   console.log({ onlineUsers });
 

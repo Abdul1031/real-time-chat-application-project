@@ -4,15 +4,28 @@ import AuthImagePattern from "../components/AuthImagePattern";
 import { Link } from "react-router-dom";
 import { Eye, EyeOff, Loader2, Lock, Mail, MessageSquare } from "lucide-react";
 
-const LoginPage = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({
+import React from "react";
+import type { FormEvent } from "react";
+
+interface LoginForm {
+  email: string;
+  password: string;
+}
+
+interface AuthStore {
+  login: (data: LoginForm) => Promise<void>;
+  isLoggingIn: boolean;
+}
+
+const LoginPage: React.FC = () => {
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [formData, setFormData] = useState<LoginForm>({
     email: "",
     password: "",
   });
-  const { login, isLoggingIn } = useAuthStore();
+  const { login, isLoggingIn } = useAuthStore() as AuthStore;
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     login(formData);
   };

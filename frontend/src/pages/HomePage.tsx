@@ -4,8 +4,20 @@ import Sidebar from "../components/Sidebar";
 import NoChatSelected from "../components/NoChatSelected";
 import ChatContainer from "../components/ChatContainer";
 
-const HomePage = () => {
-  const { selectedUser } = useChatStore();
+import React from "react";
+
+interface User {
+  _id: string;
+  fullName: string;
+  profilePic?: string;
+}
+
+interface ChatStore {
+  selectedUser: User | null;
+}
+
+const HomePage: React.FC = () => {
+  const { selectedUser } = useChatStore() as ChatStore;
 
   return (
     <div className="h-screen bg-base-200">
