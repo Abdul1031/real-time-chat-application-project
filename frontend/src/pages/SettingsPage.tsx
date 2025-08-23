@@ -21,7 +21,8 @@ const SettingsPage: React.FC = () => {
   const { theme, setTheme } = useThemeStore() as ThemeStore;
 
   return (
-    <div className="h-screen container mx-auto px-4 pt-20 max-w-5xl">
+    // ✅ added bg-base-100 here
+    <div className="min-h-screen w-full px-4 pt-20 bg-base-100">
       <div className="space-y-6">
         <div className="flex flex-col gap-1">
           <h2 className="text-lg font-semibold">Theme</h2>
@@ -57,6 +58,7 @@ const SettingsPage: React.FC = () => {
             </button>
           ))}
         </div>
+        
 
         {/* Preview Section */}
         <h3 className="text-lg font-semibold mb-3">Preview</h3>

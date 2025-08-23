@@ -31,10 +31,12 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="h-screen grid lg:grid-cols-2">
+    <div className="h-screen grid lg:grid-cols-1">
       {/* Left Side - Form */}
+      
       <div className="flex flex-col justify-center items-center p-6 sm:p-12">
         <div className="w-full max-w-md space-y-8">
+
           {/* Logo */}
           <div className="text-center mb-8">
             <div className="flex flex-col items-center gap-2 group">
@@ -130,12 +132,12 @@ const LoginPage: React.FC = () => {
       </div>
 
       {/* Right Side - Image/Pattern */}
-      <AuthImagePattern
+      {/* <AuthImagePattern
         title={"Welcome back!"}
         subtitle={
           "Sign in to continue your conversations and catch up with your messages."
         }
-      />
+      /> */}
     </div>
   );
 };

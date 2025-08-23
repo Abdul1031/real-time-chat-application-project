@@ -42,6 +42,7 @@ const ChatContainer: React.FC = () => {
     subscribeToMessages,
     unsubscribeFromMessages,
   } = useChatStore() as ChatStore;
+
   const { authUser } = useAuthStore() as AuthStore;
   const messageEndRef = useRef<HTMLDivElement>(null);
 
@@ -118,6 +119,7 @@ const ChatContainer: React.FC = () => {
             </div>
           </div>
         ))}
+        {messages.length === 0 ? <MessageSkeleton /> : null}
       </div>
 
       <MessageInput />
