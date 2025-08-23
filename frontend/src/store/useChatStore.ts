@@ -15,6 +15,7 @@ interface User {
 interface Message {
   _id: string;
   senderId: string;
+  receiverId: string;
   createdAt: string;
   image?: string;
   text?: string;
@@ -87,14 +88,27 @@ export const useChatStore = create<ChatStoreState>((set, get) => ({
     if (!selectedUser) return;
 
     const socket = (useAuthStore.getState() as any).socket;
+    const authUser = useAuthStore.getState().authUser;
+    
+    if (!authUser) return;
+    
     socket.on("newMessage", (newMessage: Message) => {
-      const isMessageSentFromSelectedUser =
-        newMessage.senderId === selectedUser._id;
-      if (!isMessageSentFromSelectedUser) return;
+      const { selectedUser: currentSelectedUser } = get() as ChatStoreState;
+      
+      const isRelevantMessage = 
+        (newMessage.senderId === currentSelectedUser?._id && newMessage.receiverId === authUser._id) ||
+        (newMessage.senderId === authUser._id && newMessage.receiverId === currentSelectedUser?._id);
+      
+      if (!isRelevantMessage) return;
 
-      set({
-        messages: [...(get() as ChatStoreState).messages, newMessage],
-      });
+      const currentMessages = (get() as ChatStoreState).messages;
+      const messageExists = currentMessages.some(msg => msg._id === newMessage._id);
+      
+      if (!messageExists) {
+        set({
+          messages: [...currentMessages, newMessage],
+        });
+      }
     });
   },
 

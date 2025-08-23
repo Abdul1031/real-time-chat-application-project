@@ -45,7 +45,7 @@ export const useAuthStore = create<AuthStoreState>((set, get) => ({
       set({ authUser: res.data });
       (get() as AuthStoreState).connectSocket();
     } catch (error: any) {
-      console.log("Error in checkAuth:", error);
+
       set({ authUser: null });
     } finally {
       set({ isCheckingAuth: false });
@@ -100,7 +100,7 @@ export const useAuthStore = create<AuthStoreState>((set, get) => ({
       set({ authUser: res.data });
       toast.success("Profile updated successfully");
     } catch (error: any) {
-      console.log("error in update profile:", error);
+
       toast.error(error.response?.data?.message || "Update failed");
     } finally {
       set({ isUpdatingProfile: false });

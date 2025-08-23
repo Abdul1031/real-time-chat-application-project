@@ -17,5 +17,4 @@ const seedDatabase = async () => {
   }
 };
 
-// Call the function
 seedDatabase();

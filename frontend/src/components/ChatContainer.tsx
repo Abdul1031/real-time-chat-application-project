@@ -15,6 +15,7 @@ interface User {
 interface Message {
   _id: string;
   senderId: string;
+  receiverId: string;
   createdAt: string;
   image?: string;
   text?: string;

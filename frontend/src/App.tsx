@@ -37,13 +37,13 @@ const App: React.FC = () => {
     useAuthStore() as AuthStore;
   const { theme } = useThemeStore() as ThemeStore;
 
-  console.log({ onlineUsers });
+
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
 
-  console.log({ authUser });
+
 
   if (isCheckingAuth && !authUser)
     return (

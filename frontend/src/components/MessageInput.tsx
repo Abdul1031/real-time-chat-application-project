@@ -47,7 +47,7 @@ const MessageInput: React.FC = () => {
         image: imagePreview,
       });
 
-      // Clear form
+
       setText("");
       setImagePreview(null);
       if (fileInputRef.current) fileInputRef.current.value = "";

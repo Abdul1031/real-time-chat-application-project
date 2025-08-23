@@ -149,13 +149,6 @@ const SignUpPage: React.FC = () => {
           </div>
         </div>
       </div>
-      {/* Right Side - Image/Pattern */}
-      {/* <div className="hidden lg:flex items-center justify-center bg-base-200 p-12">
-        <AuthImagePattern
-          title="join our community"
-          subtitle="connect with friends and share moments"
-        />
-      </div> */}
     </div>
   );
 };
