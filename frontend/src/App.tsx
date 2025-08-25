@@ -33,17 +33,12 @@ interface ThemeStore {
 }
 
 const App: React.FC = () => {
-  const { authUser, checkAuth, isCheckingAuth, onlineUsers } =
-    useAuthStore() as AuthStore;
+  const { authUser, checkAuth, isCheckingAuth } = useAuthStore() as AuthStore;
   const { theme } = useThemeStore() as ThemeStore;
-
-
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
-
-
 
   if (isCheckingAuth && !authUser)
     return (

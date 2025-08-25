@@ -1,20 +1,20 @@
-import { config } from "dotenv";
-import { connectDB } from "../lib/db.js";
-import User from "../models/user.model.js";
+// import { config } from "dotenv";
+// import { connectDB } from "../lib/db.js";
+// import User from "../models/user.model.js";
 
-config();
+// config();
 
-const seedUsers = [];
+// const seedUsers = [];
 
-const seedDatabase = async () => {
-  try {
-    await connectDB();
+// const seedDatabase = async () => {
+//   try {
+//     await connectDB();
 
-    await User.insertMany(seedUsers);
-    console.log("Database seeded successfully");
-  } catch (error) {
-    console.error("Error seeding database:", error);
-  }
-};
+//     await User.insertMany(seedUsers);
+//     console.log("Database seeded successfully");
+//   } catch (error) {
+//     console.error("Error seeding database:", error);
+//   }
+// };
 
-seedDatabase();
+// seedDatabase();
