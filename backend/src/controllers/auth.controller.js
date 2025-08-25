@@ -43,7 +43,6 @@ export const signup = async (req, res) => {
       res.status(400).json({ message: "Invalid user data" });
     }
   } catch (error) {
-
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -71,17 +70,20 @@ export const login = async (req, res) => {
       profilePic: user.profilePic,
     });
   } catch (error) {
-
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
 export const logout = (req, res) => {
   try {
-    res.cookie("jwt", "", { maxAge: 0 });
+    res.cookie("jwt", "", {
+      httpOnly: true,
+      secure: true, // set to true if using HTTPS
+      sameSite: "none", // set to "lax" if frontend and backend are on the same domain/port
+      maxAge: 0,
+    });
     res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
-
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -104,7 +106,6 @@ export const updateProfile = async (req, res) => {
 
     res.status(200).json(updatedUser);
   } catch (error) {
-
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -113,7 +114,6 @@ export const checkAuth = (req, res) => {
   try {
     res.status(200).json(req.user);
   } catch (error) {
-
     res.status(500).json({ message: "Internal Server Error" });
   }
 };

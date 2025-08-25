@@ -26,7 +26,9 @@ const Sidebar: React.FC = () => {
     getUsers();
   }, [getUsers]);
 
-  const filteredUsers = users;
+  // ✅ Ensure users is always an array
+  const filteredUsers: User[] = Array.isArray(users) ? users : [];
+
   if (isUsersLoading) return <SidebarSkeleton />;
 
   return (
@@ -39,7 +41,6 @@ const Sidebar: React.FC = () => {
       </div>
       <div className="overflow-y-auto w-full py-3">
         {filteredUsers.map((user: User) => (
-          
           <button
             key={user._id}
             onClick={() => setSelectedUser(user)}
@@ -56,7 +57,7 @@ const Sidebar: React.FC = () => {
             <div className="relative mx-auto lg:mx-0">
               <img
                 src={user.profilePic || "/avatar.png"}
-                alt={user.name}
+                alt={user.name || user.fullName}
                 className="size-12 object-cover rounded-full"
               />
             </div>
@@ -74,4 +75,5 @@ const Sidebar: React.FC = () => {
     </aside>
   );
 };
+
 export default Sidebar;
