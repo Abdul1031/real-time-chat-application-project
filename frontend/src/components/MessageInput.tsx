@@ -4,27 +4,39 @@ import { useChatStore } from "../store/useChatStore";
 import { Image, Send, X } from "lucide-react";
 import toast from "react-hot-toast";
 
+// type for message data
 interface SendMessageData {
   text: string;
   image: string | null;
 }
 
 const MessageInput: React.FC = () => {
+  // store text of message
   const [text, setText] = useState<string>("");
+
+  // store picture preview
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  // file input for upload img
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // get sendMessage fn from store
   const { sendMessage } = useChatStore() as {
     sendMessage: (data: SendMessageData) => Promise<void>;
   };
 
+  // when user pick image
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // check file is image
     if (!file.type.startsWith("image/")) {
       toast.error("Please select an image file");
       return;
     }
 
+    // read img and show preview
     const reader = new FileReader();
     reader.onloadend = () => {
       setImagePreview(reader.result as string);
@@ -32,14 +44,16 @@ const MessageInput: React.FC = () => {
     reader.readAsDataURL(file);
   };
 
+  // remove selected image
   const removeImage = () => {
     setImagePreview(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+  // when send btn press
   const handleSendMessage = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!text.trim() && !imagePreview) return;
+    if (!text.trim() && !imagePreview) return; // nothing to send
 
     try {
       await sendMessage({
@@ -47,7 +61,7 @@ const MessageInput: React.FC = () => {
         image: imagePreview,
       });
 
-
+      // reset after send
       setText("");
       setImagePreview(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -58,6 +72,7 @@ const MessageInput: React.FC = () => {
 
   return (
     <div className="p-4 w-full">
+      {/* show image preview if any */}
       {imagePreview && (
         <div className="mb-3 flex items-center gap-2">
           <div className="relative">
@@ -78,8 +93,10 @@ const MessageInput: React.FC = () => {
         </div>
       )}
 
+      {/* message form */}
       <form onSubmit={handleSendMessage} className="flex items-center gap-2">
         <div className="flex-1 flex gap-2">
+          {/* text input */}
           <input
             type="text"
             className="w-full input input-bordered rounded-lg input-sm sm:input-md"
@@ -87,6 +104,7 @@ const MessageInput: React.FC = () => {
             value={text}
             onChange={(e) => setText(e.target.value)}
           />
+          {/* hidden file input */}
           <input
             type="file"
             accept="image/*"
@@ -95,6 +113,7 @@ const MessageInput: React.FC = () => {
             onChange={handleImageChange}
           />
 
+          {/* image upload btn */}
           <button
             type="button"
             className={`hidden sm:flex btn btn-circle
@@ -104,6 +123,8 @@ const MessageInput: React.FC = () => {
             <Image size={20} />
           </button>
         </div>
+
+        {/* send message btn */}
         <button
           type="submit"
           className="btn btn-sm btn-circle"
@@ -115,4 +136,5 @@ const MessageInput: React.FC = () => {
     </div>
   );
 };
+
 export default MessageInput;

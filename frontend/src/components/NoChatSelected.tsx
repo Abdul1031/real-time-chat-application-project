@@ -1,12 +1,13 @@
 import { MessageSquare } from "lucide-react";
-
 import React from "react";
 
+// this show when no chat user is selected
 const NoChatSelected: React.FC = () => {
   return (
+    // main box full page center
     <div className="w-full flex flex-1 flex-col items-center justify-center p-16 bg-base-100/50">
       <div className="max-w-md text-center space-y-6">
-
+        {/* bounce icon in middle */}
         <div className="flex justify-center gap-4 mb-4">
           <div className="relative">
             <div
@@ -18,7 +19,7 @@ const NoChatSelected: React.FC = () => {
           </div>
         </div>
 
-
+        {/* welcome text */}
         <h2 className="text-2xl font-bold">Welcome to Chatty!</h2>
         <p className="text-base-content/60">
           Select a conversation from the sidebar to start chatting

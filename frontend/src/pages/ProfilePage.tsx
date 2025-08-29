@@ -3,6 +3,7 @@ import type { ChangeEvent } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import { Camera, Mail, User } from "lucide-react";
 
+// this interface tell how user data look like
 interface UserType {
   _id: string;
   fullName: string;
@@ -11,6 +12,7 @@ interface UserType {
   createdAt?: string;
 }
 
+// this interface for auth store, what thing it give us
 interface AuthStore {
   authUser: UserType;
   isUpdatingProfile: boolean;
@@ -18,10 +20,14 @@ interface AuthStore {
 }
 
 const ProfilePage: React.FC = () => {
+  // get user and updateProfile function from store
   const { authUser, isUpdatingProfile, updateProfile } =
     useAuthStore() as AuthStore;
+
+  // this keep which image we pick
   const [selectedImg, setSelectedImg] = useState<string | null>(null);
 
+  // when user upload new image, read it and update profile
   const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -30,8 +36,8 @@ const ProfilePage: React.FC = () => {
     reader.readAsDataURL(file);
     reader.onload = async () => {
       const base64Image = reader.result as string;
-      setSelectedImg(base64Image);
-      await updateProfile({ profilePic: base64Image });
+      setSelectedImg(base64Image); // show this image
+      await updateProfile({ profilePic: base64Image }); // send to backend/store
     };
   };
 
@@ -39,13 +45,13 @@ const ProfilePage: React.FC = () => {
     <div className="h-screen pt-20">
       <div className="max-w-2xl mx-auto p-4 py-8">
         <div className="bg-base-300 rounded-xl p-6 space-y-8">
+          {/* title and small text */}
           <div className="text-center">
             <h1 className="text-2xl font-semibold ">Profile</h1>
             <p className="mt-2">Your profile information</p>
           </div>
 
-
-
+          {/* profile picture with camera button */}
           <div className="flex flex-col items-center gap-4">
             <div className="relative">
               <img
@@ -71,8 +77,8 @@ const ProfilePage: React.FC = () => {
                   id="avatar-upload"
                   className="hidden"
                   accept="image/*"
-                  onChange={handleImageUpload}
-                  disabled={isUpdatingProfile}
+                  onChange={handleImageUpload} // when file choose
+                  disabled={isUpdatingProfile} // disable when uploading
                 />
               </label>
             </div>
@@ -83,7 +89,9 @@ const ProfilePage: React.FC = () => {
             </p>
           </div>
 
+          {/* user info box */}
           <div className="space-y-6">
+            {/* full name */}
             <div className="space-y-1.5">
               <div className="text-sm text-zinc-400 flex items-center gap-2">
                 <User className="w-4 h-4" />
@@ -94,6 +102,7 @@ const ProfilePage: React.FC = () => {
               </p>
             </div>
 
+            {/* email */}
             <div className="space-y-1.5">
               <div className="text-sm text-zinc-400 flex items-center gap-2">
                 <Mail className="w-4 h-4" />
@@ -104,8 +113,6 @@ const ProfilePage: React.FC = () => {
               </p>
             </div>
           </div>
-
-        
         </div>
       </div>
     </div>

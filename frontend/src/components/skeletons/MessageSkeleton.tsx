@@ -1,5 +1,5 @@
 const MessageSkeleton = () => {
-
+  // make 6 fake message for loading time
   const skeletonMessages = Array(6).fill(null);
 
   return (
@@ -7,18 +7,22 @@ const MessageSkeleton = () => {
       {skeletonMessages.map((_, idx) => (
         <div
           key={idx}
+          // odd show left side, even show right side
           className={`chat ${idx % 2 === 0 ? "chat-start" : "chat-end"}`}
         >
+          {/* fake profile pic round shape */}
           <div className="chat-image avatar">
             <div className="size-10 rounded-full">
               <div className="skeleton w-full h-full rounded-full" />
             </div>
           </div>
 
+          {/* fake small header, like name or time */}
           <div className="chat-header mb-1">
             <div className="skeleton h-4 w-16" />
           </div>
 
+          {/* fake message box shape */}
           <div className="chat-bubble bg-transparent p-0">
             <div className="skeleton h-16 w-[200px]" />
           </div>

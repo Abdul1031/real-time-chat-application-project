@@ -7,24 +7,32 @@ import { Eye, EyeOff, Loader2, Lock, Mail, MessageSquare } from "lucide-react";
 import React from "react";
 import type { FormEvent } from "react";
 
+// form data look like this
 interface LoginForm {
   email: string;
   password: string;
 }
 
+// auth store have login func and bool for loading
 interface AuthStore {
   login: (data: LoginForm) => Promise<void>;
   isLoggingIn: boolean;
 }
 
 const LoginPage: React.FC = () => {
+  // for show and hide password
   const [showPassword, setShowPassword] = useState<boolean>(false);
+
+  // keep email and password user type
   const [formData, setFormData] = useState<LoginForm>({
     email: "",
     password: "",
   });
+
+  // get login function and loading state from store
   const { login, isLoggingIn } = useAuthStore() as AuthStore;
 
+  // when form submit, stop refresh and call login
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     login(formData);
@@ -32,12 +40,9 @@ const LoginPage: React.FC = () => {
 
   return (
     <div className="h-screen grid lg:grid-cols-1">
-
-      
       <div className="flex flex-col justify-center items-center p-6 sm:p-12">
         <div className="w-full max-w-md space-y-8">
-
-
+          {/* top welcome message */}
           <div className="text-center mb-8">
             <div className="flex flex-col items-center gap-2 group">
               <div
@@ -51,8 +56,9 @@ const LoginPage: React.FC = () => {
             </div>
           </div>
 
-
+          {/* form start */}
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* email input */}
             <div className="form-control">
               <label className="label">
                 <span className="label-text font-medium">Email</span>
@@ -73,6 +79,7 @@ const LoginPage: React.FC = () => {
               </div>
             </div>
 
+            {/* password input with show/hide */}
             <div className="form-control">
               <label className="label">
                 <span className="label-text font-medium">Password</span>
@@ -93,7 +100,7 @@ const LoginPage: React.FC = () => {
                 <button
                   type="button"
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  onClick={() => setShowPassword(!showPassword)}
+                  onClick={() => setShowPassword(!showPassword)} // toggle password show
                 >
                   {showPassword ? (
                     <EyeOff className="h-5 w-5 text-base-content/40" />
@@ -104,6 +111,7 @@ const LoginPage: React.FC = () => {
               </div>
             </div>
 
+            {/* login button */}
             <button
               type="submit"
               className="btn btn-primary w-full"
@@ -120,6 +128,7 @@ const LoginPage: React.FC = () => {
             </button>
           </form>
 
+          {/* link to signup */}
           <div className="text-center">
             <p className="text-base-content/60">
               Don&apos;t have an account?{" "}

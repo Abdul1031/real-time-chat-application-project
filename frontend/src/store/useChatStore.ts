@@ -1,9 +1,9 @@
-
 import { create } from "zustand";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../lib/axios";
 import { useAuthStore } from "./useAuthStore";
 
+// this is the user object, it has all info about a user
 interface User {
   _id: string;
   fullName: string;
@@ -12,6 +12,7 @@ interface User {
   createdAt?: string;
 }
 
+// this is the message object, what a message looks like
 interface Message {
   _id: string;
   senderId: string;
@@ -21,6 +22,7 @@ interface Message {
   text?: string;
 }
 
+// this is the chat store, it keeps all chat related states and functions
 interface ChatStoreState {
   messages: Message[];
   users: User[];
@@ -35,6 +37,7 @@ interface ChatStoreState {
   setSelectedUser: (selectedUser: User | null) => void;
 }
 
+// this is zustand store for chat, here we handle everything about messages and users
 export const useChatStore = create<ChatStoreState>((set, get) => ({
   messages: [],
   users: [],
@@ -42,6 +45,7 @@ export const useChatStore = create<ChatStoreState>((set, get) => ({
   isUsersLoading: false,
   isMessagesLoading: false,
 
+  // this function gets all the users that can chat
   getUsers: async () => {
     set({ isUsersLoading: true });
     try {
@@ -54,6 +58,7 @@ export const useChatStore = create<ChatStoreState>((set, get) => ({
     }
   },
 
+  // this function gets all the messages with a selected user
   getMessages: async (userId: string) => {
     set({ isMessagesLoading: true });
     try {
@@ -67,6 +72,8 @@ export const useChatStore = create<ChatStoreState>((set, get) => ({
       set({ isMessagesLoading: false });
     }
   },
+
+  // this function sends a new message to the selected user
   sendMessage: async (messageData: { text: string; image: string | null }) => {
     const { selectedUser, messages } = get() as ChatStoreState;
     try {
@@ -83,6 +90,7 @@ export const useChatStore = create<ChatStoreState>((set, get) => ({
     }
   },
 
+  // this function listens for new incoming messages using socket
   subscribeToMessages: () => {
     const { selectedUser } = get() as ChatStoreState;
     if (!selectedUser) return;
@@ -112,10 +120,12 @@ export const useChatStore = create<ChatStoreState>((set, get) => ({
     });
   },
 
+  // this function removes the listener so we stop receiving new messages
   unsubscribeFromMessages: () => {
     const socket = (useAuthStore.getState() as any).socket;
     socket.off("newMessage");
   },
 
+  // this just changes which user is selected in chat
   setSelectedUser: (selectedUser: User | null) => set({ selectedUser }),
 }));

@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 
+// user data type
 interface AuthUser {
   _id: string;
   fullName: string;
@@ -8,24 +9,28 @@ interface AuthUser {
   profilePic?: string;
 }
 
+// auth store have logout and user
 interface AuthStore {
   logout: () => Promise<void>;
   authUser: AuthUser | null;
 }
-import { LogOut, MessageSquare, Settings, User } from "lucide-react";
 
+import { LogOut, MessageSquare, Settings, User } from "lucide-react";
 import React from "react";
 
+// top bar of app
 const Navbar: React.FC = () => {
   const { logout, authUser } = useAuthStore() as AuthStore;
 
   return (
+    // header fix on top
     <header
       className="bg-base-100 border-b border-base-300 fixed w-full top-0 z-40 
     backdrop-blur-lg bg-base-100/80"
     >
       <div className="container mx-auto px-4 h-16">
         <div className="flex items-center justify-between h-full">
+          {/* left side logo */}
           <div className="flex items-center gap-8">
             <Link
               to="/"
@@ -38,7 +43,9 @@ const Navbar: React.FC = () => {
             </Link>
           </div>
 
+          {/* right side buttons */}
           <div className="flex items-center gap-2">
+            {/* always show setting */}
             <Link
               to={"/settings"}
               className={`
@@ -49,13 +56,16 @@ const Navbar: React.FC = () => {
               <span className="hidden sm:inline">Settings</span>
             </Link>
 
+            {/* only show when user login */}
             {authUser && (
               <>
+                {/* profile btn */}
                 <Link to={"/profile"} className={`btn btn-sm gap-2`}>
                   <User className="size-5" />
                   <span className="hidden sm:inline">Profile</span>
                 </Link>
 
+                {/* logout btn */}
                 <button className="flex gap-2 items-center" onClick={logout}>
                   <LogOut className="size-5" />
                   <span className="hidden sm:inline">Logout</span>
@@ -68,4 +78,5 @@ const Navbar: React.FC = () => {
     </header>
   );
 };
+
 export default Navbar;
