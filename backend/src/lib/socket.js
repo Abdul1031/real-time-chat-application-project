@@ -9,7 +9,11 @@ const io = new Server(server, {
   cors: {
     origin: process.env.NODE_ENV === "development" 
       ? "http://localhost:5173" 
-      : process.env.FRONTEND_URL || "http://localhost:5173",
+      : process.env.FRONTEND_URL || [
+          "http://localhost:5173",
+          /^https:\/\/.*\.azurewebsites\.net$/,
+          /^https:\/\/.*\.azurestaticapps\.net$/
+        ],
     credentials: true
   },
 });
