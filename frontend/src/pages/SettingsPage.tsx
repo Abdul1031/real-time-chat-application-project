@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { THEMES } from "../constants";
 import { useThemeStore } from "../store/useThemeStore";
-import { Send } from "lucide-react";
+import { Bell, BellOff, Send } from "lucide-react";
+import toast from "react-hot-toast";
 
 // this store hold theme and function to set theme
 interface ThemeStore {
@@ -19,13 +20,54 @@ const PREVIEW_MESSAGES = [
   },
 ];
 
+const getNotificationPermission = () =>
+  typeof Notification !== "undefined" ? Notification.permission : "unsupported";
+
 const SettingsPage: React.FC = () => {
   // take theme and setTheme from store
   const { theme, setTheme } = useThemeStore() as ThemeStore;
+  const [notificationPermission, setNotificationPermission] = useState(getNotificationPermission);
+
+  const requestNotifications = async () => {
+    if (typeof Notification === "undefined") {
+      toast.error("Notifications aren't supported in this browser");
+      return;
+    }
+    const permission = await Notification.requestPermission();
+    setNotificationPermission(permission);
+    if (permission === "granted") {
+      toast.success("Notifications enabled");
+    } else if (permission === "denied") {
+      toast.error("Notifications blocked — enable them in your browser settings");
+    }
+  };
 
   return (
     <div className="min-h-screen w-full px-4 pt-20 bg-base-100">
       <div className="space-y-6">
+        {/* notifications section */}
+        <div className="flex flex-col gap-1">
+          <h2 className="text-lg font-semibold">Notifications</h2>
+          <p className="text-sm text-base-content/70">
+            Get a desktop notification when a new message arrives in a background tab
+          </p>
+        </div>
+        <div>
+          {notificationPermission === "granted" ? (
+            <div className="flex items-center gap-2 text-success text-sm">
+              <Bell className="size-4" /> Notifications are enabled
+            </div>
+          ) : notificationPermission === "denied" ? (
+            <div className="flex items-center gap-2 text-error text-sm">
+              <BellOff className="size-4" /> Notifications are blocked in your browser settings
+            </div>
+          ) : (
+            <button className="btn btn-sm btn-primary gap-2" onClick={requestNotifications}>
+              <Bell className="size-4" /> Enable notifications
+            </button>
+          )}
+        </div>
+
         {/* theme section title and small text */}
         <div className="flex flex-col gap-1">
           <h2 className="text-lg font-semibold">Theme</h2>

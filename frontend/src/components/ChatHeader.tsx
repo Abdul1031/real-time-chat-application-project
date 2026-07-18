@@ -2,23 +2,16 @@ import React from "react";
 import { X } from "lucide-react";
 
 import { useChatStore } from "../store/useChatStore";
-
-// user type, got id, name, pic
-interface User {
-  _id: string;
-  fullName: string;
-  profilePic?: string;
-}
-
-// store type for chat header
-interface ChatHeaderStore {
-  selectedUser: User;
-  setSelectedUser: (user: User | null) => void;
-}
+import { useAuthStore } from "../store/useAuthStore";
 
 const ChatHeader: React.FC = () => {
   // get selected user and fn to clear user
-  const { selectedUser, setSelectedUser } = useChatStore() as ChatHeaderStore;
+  const { selectedUser, setSelectedUser, isPeerTyping } = useChatStore();
+  const { onlineUsers } = useAuthStore();
+
+  if (!selectedUser) return null;
+
+  const isOnline = onlineUsers.includes(selectedUser._id);
 
   return (
     // top bar of chat box
@@ -37,11 +30,14 @@ const ChatHeader: React.FC = () => {
 
           <div>
             <h3 className="font-medium">{selectedUser.fullName}</h3>
+            <p className="text-xs text-base-content/60" aria-live="polite">
+              {isPeerTyping ? "typing…" : isOnline ? "Online" : "Offline"}
+            </p>
           </div>
         </div>
 
         {/* right side, close btn */}
-        <button onClick={() => setSelectedUser(null)}>
+        <button onClick={() => setSelectedUser(null)} aria-label="Close conversation">
           <X />
         </button>
       </div>

@@ -9,41 +9,54 @@ import ProfilePage from "./pages/ProfilePage";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuthStore } from "./store/useAuthStore";
 import { useThemeStore } from "./store/useThemeStore";
+import { useChatStore } from "./store/useChatStore";
 
 import { Loader } from "lucide-react";
 import { Toaster } from "react-hot-toast";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 
-// this user interface, only keep user info
-interface User {
-  _id: string;
-  fullName: string;
-  profilePic?: string;
-}
-
-// this auth store interface, keep login user and some function
-interface AuthStore {
-  authUser: User | null;
-  checkAuth: () => Promise<void>;
-  isCheckingAuth: boolean;
-  onlineUsers?: User[];
-}
-
-// this theme store, only for theme
-interface ThemeStore {
-  theme: string;
-}
+const APP_TITLE = "Chatty";
 
 // this main app component
 const App: React.FC = () => {
-  const { authUser, checkAuth, isCheckingAuth } = useAuthStore() as AuthStore;
-  const { theme } = useThemeStore() as ThemeStore;
+  const { authUser, checkAuth, isCheckingAuth, socket } = useAuthStore();
+  const { theme } = useThemeStore();
+  const { initSocketListeners, teardownSocketListeners, unreadCounts, selectedUser, markAsSeen } =
+    useChatStore();
 
   // when app start, we check user login or not
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
+
+  // once the socket is connected, wire up the app-wide message/typing/reaction listeners
+  useEffect(() => {
+    if (socket) {
+      initSocketListeners();
+    }
+    return () => {
+      teardownSocketListeners();
+    };
+  }, [socket, initSocketListeners, teardownSocketListeners]);
+
+  // re-mark the open thread as seen when the tab regains focus
+  useEffect(() => {
+    const onFocus = () => {
+      if (selectedUser) markAsSeen(selectedUser._id);
+    };
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
+  }, [selectedUser, markAsSeen]);
+
+  // reflect total unread count in the tab title
+  const totalUnread = useMemo(
+    () => Object.values(unreadCounts).reduce((sum, n) => sum + n, 0),
+    [unreadCounts]
+  );
+  useEffect(() => {
+    document.title = totalUnread > 0 ? `(${totalUnread}) ${APP_TITLE}` : APP_TITLE;
+  }, [totalUnread]);
 
   // if still checking login, we show loading icon
   if (isCheckingAuth && !authUser)

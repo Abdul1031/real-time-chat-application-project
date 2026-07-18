@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
-import AuthImagePattern from "../components/AuthImagePattern";
 import { Link } from "react-router-dom";
 import { Eye, EyeOff, Loader2, Lock, Mail, MessageSquare } from "lucide-react";
 
@@ -60,7 +59,7 @@ const LoginPage: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* email input */}
             <div className="form-control">
-              <label className="label">
+              <label className="label" htmlFor="login-email">
                 <span className="label-text font-medium">Email</span>
               </label>
               <div className="relative">
@@ -68,7 +67,9 @@ const LoginPage: React.FC = () => {
                   <Mail className="h-5 w-5 text-base-content/40" />
                 </div>
                 <input
+                  id="login-email"
                   type="email"
+                  autoComplete="email"
                   className={`input input-bordered w-full pl-10`}
                   placeholder="you@example.com"
                   value={formData.email}
@@ -81,7 +82,7 @@ const LoginPage: React.FC = () => {
 
             {/* password input with show/hide */}
             <div className="form-control">
-              <label className="label">
+              <label className="label" htmlFor="login-password">
                 <span className="label-text font-medium">Password</span>
               </label>
               <div className="relative">
@@ -89,7 +90,9 @@ const LoginPage: React.FC = () => {
                   <Lock className="h-5 w-5 text-base-content/40" />
                 </div>
                 <input
+                  id="login-password"
                   type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
                   className={`input input-bordered w-full pl-10`}
                   placeholder="••••••••"
                   value={formData.password}
@@ -101,6 +104,7 @@ const LoginPage: React.FC = () => {
                   type="button"
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   onClick={() => setShowPassword(!showPassword)} // toggle password show
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
                     <EyeOff className="h-5 w-5 text-base-content/40" />

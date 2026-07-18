@@ -1,14 +1,10 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
-import { useChatStore } from "../store/useChatStore";
+import { emitStopTyping, emitTyping, useChatStore } from "../store/useChatStore";
 import { Image, Send, X } from "lucide-react";
 import toast from "react-hot-toast";
 
-// type for message data
-interface SendMessageData {
-  text: string;
-  image: string | null;
-}
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5MB, comfortably under the backend's 10mb JSON body limit
 
 const MessageInput: React.FC = () => {
   // store text of message
@@ -20,10 +16,14 @@ const MessageInput: React.FC = () => {
   // file input for upload img
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // get sendMessage fn from store
-  const { sendMessage } = useChatStore() as {
-    sendMessage: (data: SendMessageData) => Promise<void>;
-  };
+  const { sendMessage, selectedUser, replyingTo, setReplyingTo } = useChatStore();
+
+  // stop the typing indicator if the user navigates away mid-type
+  useEffect(() => {
+    return () => {
+      if (selectedUser) emitStopTyping(selectedUser._id);
+    };
+  }, [selectedUser]);
 
   // when user pick image
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -33,6 +33,11 @@ const MessageInput: React.FC = () => {
     // check file is image
     if (!file.type.startsWith("image/")) {
       toast.error("Please select an image file");
+      return;
+    }
+
+    if (file.size > MAX_IMAGE_BYTES) {
+      toast.error("Image is too large (max 5MB)");
       return;
     }
 
@@ -50,10 +55,17 @@ const MessageInput: React.FC = () => {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+  const handleTextChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setText(e.target.value);
+    if (selectedUser) emitTyping(selectedUser._id);
+  };
+
   // when send btn press
   const handleSendMessage = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!text.trim() && !imagePreview) return; // nothing to send
+
+    if (selectedUser) emitStopTyping(selectedUser._id);
 
     try {
       await sendMessage({
@@ -72,6 +84,26 @@ const MessageInput: React.FC = () => {
 
   return (
     <div className="p-4 w-full">
+      {/* reply preview banner */}
+      {replyingTo && (
+        <div className="mb-3 flex items-center justify-between gap-2 bg-base-200 rounded-lg px-3 py-2 border-l-4 border-primary">
+          <div className="min-w-0">
+            <p className="text-xs font-medium text-primary">Replying to</p>
+            <p className="text-sm truncate text-base-content/70">
+              {replyingTo.text || (replyingTo.image ? "Image" : "")}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setReplyingTo(null)}
+            aria-label="Cancel reply"
+            className="btn btn-xs btn-circle btn-ghost"
+          >
+            <X className="size-3" />
+          </button>
+        </div>
+      )}
+
       {/* show image preview if any */}
       {imagePreview && (
         <div className="mb-3 flex items-center gap-2">
@@ -86,6 +118,7 @@ const MessageInput: React.FC = () => {
               className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-base-300
               flex items-center justify-center"
               type="button"
+              aria-label="Remove image"
             >
               <X className="size-3" />
             </button>
@@ -99,10 +132,11 @@ const MessageInput: React.FC = () => {
           {/* text input */}
           <input
             type="text"
+            aria-label="Type a message"
             className="w-full input input-bordered rounded-lg input-sm sm:input-md"
             placeholder="Type a message..."
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={handleTextChange}
           />
           {/* hidden file input */}
           <input
@@ -119,6 +153,7 @@ const MessageInput: React.FC = () => {
             className={`hidden sm:flex btn btn-circle
                      ${imagePreview ? "text-emerald-500" : "text-zinc-400"}`}
             onClick={() => fileInputRef.current?.click()}
+            aria-label="Attach an image"
           >
             <Image size={20} />
           </button>
@@ -129,6 +164,7 @@ const MessageInput: React.FC = () => {
           type="submit"
           className="btn btn-sm btn-circle"
           disabled={!text.trim() && !imagePreview}
+          aria-label="Send message"
         >
           <Send size={22} />
         </button>

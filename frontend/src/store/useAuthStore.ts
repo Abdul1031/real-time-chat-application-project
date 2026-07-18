@@ -1,10 +1,7 @@
 import { create } from "zustand";
-import { axiosInstance } from "../lib/axios.js";
+import { axiosInstance, SOCKET_URL } from "../lib/axios.js";
 import toast from "react-hot-toast";
-import { io } from "socket.io-client";
-
-// this is base url where api is running, i am just removing /api from it
-const BASE_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || '';
+import { io, Socket } from "socket.io-client";
 
 // this is the user object, like what info user has
 interface AuthUser {
@@ -22,7 +19,8 @@ interface AuthStoreState {
   isLoggingIn: boolean;
   isUpdatingProfile: boolean;
   isCheckingAuth: boolean;
-  socket: any;
+  socket: Socket | null;
+  onlineUsers: string[];
   checkAuth: () => Promise<void>;
   signup: (data: { fullName: string; email: string; password: string }) => Promise<void>;
   login: (data: { email: string; password: string }) => Promise<void>;
@@ -40,13 +38,14 @@ export const useAuthStore = create<AuthStoreState>((set, get) => ({
   isUpdatingProfile: false,
   isCheckingAuth: true,
   socket: null,
+  onlineUsers: [],
 
   // this function is just checking if user is logged in or not
   checkAuth: async () => {
     try {
       const res = await axiosInstance.get("/auth/check");
       set({ authUser: res.data });
-      (get() as AuthStoreState).connectSocket();
+      get().connectSocket();
     } catch (error: any) {
       set({ authUser: null });
     } finally {
@@ -61,7 +60,7 @@ export const useAuthStore = create<AuthStoreState>((set, get) => ({
       const res = await axiosInstance.post("/auth/signup", data);
       set({ authUser: res.data });
       toast.success("Account created successfully");
-      (get() as AuthStoreState).connectSocket();
+      get().connectSocket();
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Signup failed");
     } finally {
@@ -76,7 +75,7 @@ export const useAuthStore = create<AuthStoreState>((set, get) => ({
       const res = await axiosInstance.post("/auth/login", data);
       set({ authUser: res.data });
       toast.success("Logged in successfully");
-      (get() as AuthStoreState).connectSocket();
+      get().connectSocket();
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Login failed");
     } finally {
@@ -90,7 +89,7 @@ export const useAuthStore = create<AuthStoreState>((set, get) => ({
       await axiosInstance.post("/auth/logout");
       set({ authUser: null });
       toast.success("Logged out successfully");
-      (get() as AuthStoreState).disconnectSocket();
+      get().disconnectSocket();
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Logout failed");
     } finally {
@@ -114,21 +113,45 @@ export const useAuthStore = create<AuthStoreState>((set, get) => ({
 
   // this function connects the socket when user is logged in
   connectSocket: () => {
-    const { authUser, socket } = get() as AuthStoreState;
+    const { authUser, socket } = get();
     if (!authUser || socket?.connected) return;
 
-    const newSocket = io(BASE_URL, {
-      query: {
+    const newSocket = io(SOCKET_URL, {
+      auth: {
         userId: authUser._id,
       },
+      transports: ["websocket", "polling"],
     });
-    newSocket.connect();
+
+    newSocket.on("connect_error", (error) => {
+      console.error("Socket connect error:", error);
+    });
+
+    newSocket.on("disconnect", (reason) => {
+      console.warn("Socket disconnected:", reason);
+    });
+
+    newSocket.on("getOnlineUsers", (userIds: string[]) => {
+      set({ onlineUsers: userIds });
+    });
+
     set({ socket: newSocket });
   },
 
   // this function disconnects the socket when user logs out
   disconnectSocket: () => {
-    const { socket } = get() as AuthStoreState;
+    const { socket } = get();
     if (socket?.connected) socket.disconnect();
+    set({ socket: null, onlineUsers: [] });
   },
 }));
+
+// if a request comes back 401 (e.g. cookie expired), drop local auth state
+// so the UI reflects the logged-out state instead of hanging in a broken session
+window.addEventListener("auth:unauthorized", () => {
+  const { authUser, disconnectSocket } = useAuthStore.getState();
+  if (authUser) {
+    disconnectSocket();
+    useAuthStore.setState({ authUser: null });
+  }
+});

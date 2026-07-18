@@ -11,7 +11,6 @@ import {
   User,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import AuthImagePattern from "../components/AuthImagePattern";
 
 // this form interface, keep signup user data
 interface SignUpForm {
@@ -68,7 +67,7 @@ const SignUpPage: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* input for full name */}
             <div className="form-control">
-              <label className="label">
+              <label className="label" htmlFor="signup-fullname">
                 <span className="label-text font-medium">Full Name</span>
               </label>
               <div className="relative">
@@ -76,7 +75,9 @@ const SignUpPage: React.FC = () => {
                   <User className="w-5 h-5 text-base-content/40" />
                 </div>
                 <input
+                  id="signup-fullname"
                   type="text"
+                  autoComplete="name"
                   className="input input-bordered w-full pl-10"
                   placeholder="john doe"
                   value={formData.fullName}
@@ -89,7 +90,7 @@ const SignUpPage: React.FC = () => {
 
             {/* input for email */}
             <div className="form-control">
-              <label className="label">
+              <label className="label" htmlFor="signup-email">
                 <span className="label-text font-medium">Email</span>
               </label>
               <div className="relative">
@@ -97,7 +98,9 @@ const SignUpPage: React.FC = () => {
                   <Mail className="size-5 text-base-content/40" />
                 </div>
                 <input
+                  id="signup-email"
                   type="email"
+                  autoComplete="email"
                   className={`input input-bordered w-full pl-10`}
                   placeholder="you@example.com"
                   value={formData.email}
@@ -110,7 +113,7 @@ const SignUpPage: React.FC = () => {
 
             {/* input for password */}
             <div className="form-control">
-              <label className="label">
+              <label className="label" htmlFor="signup-password">
                 <span className="label-text font-medium">Password</span>
               </label>
               <div className="relative">
@@ -118,7 +121,9 @@ const SignUpPage: React.FC = () => {
                   <Lock className="size-5 text-base-content/40" />
                 </div>
                 <input
+                  id="signup-password"
                   type={showPassword ? "text" : "password"} // change input type
+                  autoComplete="new-password"
                   className={`input input-bordered w-full pl-10`}
                   placeholder="*******"
                   value={formData.password}
@@ -131,6 +136,7 @@ const SignUpPage: React.FC = () => {
                   type="button"
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
                     <EyeOff className="size-5 text-base-content/40" />

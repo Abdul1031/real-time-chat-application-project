@@ -61,6 +61,7 @@ const ProfilePage: React.FC = () => {
               />
               <label
                 htmlFor="avatar-upload"
+                aria-label="Change profile photo"
                 className={`
                   absolute bottom-0 right-0 
                   bg-base-content hover:scale-105
