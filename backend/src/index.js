@@ -60,7 +60,9 @@ const frontendDistPath = path.join(__dirname, "../frontend/dist");
 if (process.env.NODE_ENV === "production" && fs.existsSync(frontendDistPath)) {
   app.use(express.static(frontendDistPath));
 
-  app.get("*", (req, res) => {
+  // no path pattern here — Express 5's router (path-to-regexp v8) no longer
+  // accepts a bare "*" wildcard string, so a plain fallback middleware is used
+  app.use((req, res) => {
     res.sendFile(path.join(frontendDistPath, "index.html"));
   });
 } else {
