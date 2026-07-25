@@ -8,6 +8,18 @@ export const axiosInstance = axios.create({
   withCredentials: true,
 });
 
+// primary auth path in production: the frontend (Vercel) and backend (Render)
+// are different domains, and browsers increasingly block cross-site cookies
+// (Chrome Incognito, Safari, Firefox) — so the JWT cookie alone isn't reliable.
+// A Bearer token stored client-side sidesteps that entirely.
+axiosInstance.interceptors.request.use((config) => {
+  const token = localStorage.getItem("jwt_token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {

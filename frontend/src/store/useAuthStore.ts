@@ -10,6 +10,7 @@ interface AuthUser {
   profilePic?: string;
   email?: string;
   createdAt?: string;
+  token?: string;
 }
 
 // this is the whole auth store state, like all the things we are handling about user
@@ -58,6 +59,7 @@ export const useAuthStore = create<AuthStoreState>((set, get) => ({
     set({ isSigningUp: true });
     try {
       const res = await axiosInstance.post("/auth/signup", data);
+      if (res.data.token) localStorage.setItem("jwt_token", res.data.token);
       set({ authUser: res.data });
       toast.success("Account created successfully");
       get().connectSocket();
@@ -73,6 +75,7 @@ export const useAuthStore = create<AuthStoreState>((set, get) => ({
     set({ isLoggingIn: true });
     try {
       const res = await axiosInstance.post("/auth/login", data);
+      if (res.data.token) localStorage.setItem("jwt_token", res.data.token);
       set({ authUser: res.data });
       toast.success("Logged in successfully");
       get().connectSocket();
@@ -87,6 +90,7 @@ export const useAuthStore = create<AuthStoreState>((set, get) => ({
   logout: async () => {
     try {
       await axiosInstance.post("/auth/logout");
+      localStorage.removeItem("jwt_token");
       set({ authUser: null });
       toast.success("Logged out successfully");
       get().disconnectSocket();
@@ -151,6 +155,7 @@ export const useAuthStore = create<AuthStoreState>((set, get) => ({
 window.addEventListener("auth:unauthorized", () => {
   const { authUser, disconnectSocket } = useAuthStore.getState();
   if (authUser) {
+    localStorage.removeItem("jwt_token");
     disconnectSocket();
     useAuthStore.setState({ authUser: null });
   }
